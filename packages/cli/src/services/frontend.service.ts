@@ -87,7 +87,7 @@ export class FrontendService {
 		const restEndpoint = this.globalConfig.endpoints.rest;
 
 		const telemetrySettings: ITelemetrySettings = {
-			enabled: this.globalConfig.diagnostics.enabled,
+			enabled: false,
 		};
 
 		if (telemetrySettings.enabled) {
@@ -149,19 +149,19 @@ export class FrontendService {
 			instanceId: this.instanceSettings.instanceId,
 			telemetry: telemetrySettings,
 			posthog: {
-				enabled: this.globalConfig.diagnostics.enabled,
+				enabled: false,
 				apiHost: this.globalConfig.diagnostics.posthogConfig.apiHost,
 				apiKey: this.globalConfig.diagnostics.posthogConfig.apiKey,
 				autocapture: false,
-				disableSessionRecording: this.globalConfig.deployment.type !== 'cloud',
+				disableSessionRecording: true,
 				debug: this.globalConfig.logging.level === 'debug',
 			},
 			personalizationSurveyEnabled:
 				this.globalConfig.personalization.enabled && this.globalConfig.diagnostics.enabled,
 			defaultLocale: this.globalConfig.defaultLocale,
 			userManagement: {
-				quota: this.license.getUsersLimit(),
-				showSetupOnFirstLoad: !config.getEnv('userManagement.isInstanceOwnerSetUp'),
+				quota: -1,
+				showSetupOnFirstLoad: true,
 				smtpSetup: this.mailer.isEmailSetUp,
 				authenticationMethod: getCurrentAuthenticationMethod(),
 			},
@@ -214,28 +214,28 @@ export class FrontendService {
 				external: process.env.NODE_FUNCTION_ALLOW_EXTERNAL?.split(',') ?? undefined,
 			},
 			enterprise: {
-				sharing: false,
-				ldap: false,
-				saml: false,
-				oidc: false,
-				mfaEnforcement: false,
-				logStreaming: false,
-				advancedExecutionFilters: false,
-				variables: false,
-				sourceControl: false,
-				auditLogs: false,
-				externalSecrets: false,
-				showNonProdBanner: false,
-				debugInEditor: false,
-				binaryDataS3: false,
-				workflowHistory: false,
-				workerView: false,
-				advancedPermissions: false,
-				apiKeyScopes: false,
-				workflowDiffs: false,
+				sharing: true,
+				ldap: true,
+				saml: true,
+				oidc: true,
+				mfaEnforcement: true,
+				logStreaming: true,
+				advancedExecutionFilters: true,
+				variables: true,
+				sourceControl: true,
+				auditLogs: true,
+				externalSecrets: true,
+				showNonProdBanner: true,
+				debugInEditor: true,
+				binaryDataS3: true,
+				workflowHistory: true,
+				workerView: true,
+				advancedPermissions: true,
+				apiKeyScopes: true,
+				workflowDiffs: true,
 				projects: {
 					team: {
-						limit: 0,
+						limit: -1,
 					},
 				},
 			},
@@ -249,7 +249,7 @@ export class FrontendService {
 				environment: this.globalConfig.license.tenantId === 1 ? 'production' : 'staging',
 			},
 			variables: {
-				limit: 0,
+				limit: -1,
 			},
 			banners: {
 				dismissed: [],

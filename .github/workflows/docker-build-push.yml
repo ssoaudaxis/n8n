@@ -10,9 +10,6 @@ env:
   NODE_OPTIONS: '--max-old-space-size=7168'
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
-
   workflow_call:
     inputs:
       n8n_version:
@@ -134,7 +131,7 @@ jobs:
               "platform": ["amd64"],
               "include": [{
                 "platform": "amd64",
-                "runner": "blacksmith-4vcpu-ubuntu-2204",
+                "runner": "ubuntu-latest",
                 "docker_platform": "linux/amd64"
               }]
             }'
@@ -144,11 +141,11 @@ jobs:
               "platform": ["amd64", "arm64"],
               "include": [{
                 "platform": "amd64",
-                "runner": "blacksmith-4vcpu-ubuntu-2204",
+                "runner": "ubuntu-latest",
                 "docker_platform": "linux/amd64"
               }, {
                 "platform": "arm64",
-                "runner": "blacksmith-4vcpu-ubuntu-2204-arm",
+                "runner": "ubuntu-latest",
                 "docker_platform": "linux/arm64"
               }]
             }'
@@ -174,10 +171,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup and Build
-        uses: n8n-io/n8n/.github/actions/setup-nodejs-blacksmith@f5fbbbe0a28a886451c886cac6b49192a39b0eea # v1.104.1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
         with:
-          build-command: pnpm build:n8n
+          version: '10.12.1'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build:n8n
 
       - name: Determine Docker tags
         id: determine-tags
@@ -279,7 +288,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: useblacksmith/build-push-action@574eb0ee0b59c6a687ace24192f0727dfb65d6d7 # v1.2
+        uses: docker/build-push-action@4f7cdeb0f05278b464e71357394bf2c61f94138e # v6.11.0
         with:
           context: .
           file: ./docker/images/n8n/Dockerfile

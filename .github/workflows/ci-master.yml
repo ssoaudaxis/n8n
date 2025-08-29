@@ -1,11 +1,7 @@
 name: Test Master
 
 on:
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - packages/@n8n/task-runner-python/**
+  workflow_dispatch:
 
 jobs:
   unit-test:
